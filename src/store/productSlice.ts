@@ -61,7 +61,7 @@ const productSlice = createSlice({
         state.currentPage = action.payload;
     },
     setProducts(state, action: PayloadAction<Product[]>) {
-      state.items = action.payload;  // Met à jour la liste des produits
+      state.items = action.payload;
     }
   },
   extraReducers: (builder) => {

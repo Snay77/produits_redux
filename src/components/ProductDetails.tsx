@@ -10,148 +10,139 @@ import React from "react";
 const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-
-  // Récupère le produit depuis le store
-  const product: Product | undefined = useSelector((state: RootState) =>
+  const product = useSelector((state: RootState) =>
     state.products.items.find((e) => e.id === parseInt(id ?? ""))
   );
-
-  // Récupère la wishlist pour savoir si ce produit est dedans
   const wishlistItems = useSelector((state: RootState) => state.wishlist.items);
   const isInWishlist = wishlistItems.some((item) => item.id === product?.id);
 
   if (!id || !product) {
-    return <p className="text-center text-gray-500 mt-8">Produit non trouvé</p>;
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">Produit non trouvé</p>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      {/* Header Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-        <img
-          src={product.thumbnail}
-          alt={product.title}
-          className="w-full h-auto object-cover rounded-lg shadow-lg"
-        />
-        <div>
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">
-            {product.title}
-          </h1>
-          <p className="text-gray-500 text-lg mb-2">
-            Catégorie : {product.category}
-          </p>
-          <p className="text-gray-500 text-lg">Marque : {product.brand}</p>
-
-          {/* Bouton Ajouter au panier */}
-          <button
-            onClick={() => dispatch(addToCart(product))}
-            className="bg-green-500 text-white px-4 py-2 rounded mt-4 hover:bg-green-600"
-          >
-            Ajouter au panier
-          </button>
-
-          {/* Bouton Wishlist */}
-          <button
-            onClick={() => dispatch(toggleWishlist(product))}
-            className="ml-4 mt-4 inline-flex items-center justify-center"
-          >
-            {isInWishlist ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-                className="text-red-500 w-6 h-6"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M11.998 21.35l-1.448-1.32C5.4 15.368 2 12.273 2 8.497 2 5.421 4.42 3 7.497 3c1.74 0 3.409.81 4.501 2.09C13.093 3.81 14.762 3 16.502 3 19.58 3 22 5.421 22 8.497c0 3.776-3.4 6.871-8.55 
-                  11.534l-1.452 1.319z"
-                  clipRule="evenodd"
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="grid md:grid-cols-2 gap-8 p-8">
+          <div className="space-y-4">
+            <img
+              src={product.thumbnail}
+              alt={product.title}
+              className="w-full aspect-square object-cover rounded-lg"
+            />
+            <div className="grid grid-cols-4 gap-2">
+              {product.images?.slice(0, 4).map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`${product.title} - vue ${index + 1}`}
+                  className="w-full aspect-square object-cover rounded-lg cursor-pointer 
+                           hover:opacity-75 transition-opacity"
                 />
-              </svg>
-            ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                className="text-gray-500 w-6 h-6"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 
-                  1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 
-                  3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Info */}
-        <div>
-          <p className="text-gray-700 text-lg mb-6">{product.description}</p>
-          <p className="text-2xl font-semibold text-red-600 mb-4">
-            Prix : {product.price} EUR{" "}
-            <span className="text-sm text-gray-500">
-              (-{product.discountPercentage}%)
-            </span>
-          </p>
-          <p className="text-green-600 font-medium mb-4">
-            {product.availabilityStatus}
-          </p>
-          <p className="text-gray-500 text-lg">
-            Évaluation : {product.rating} / 5
-          </p>
-          <p className="text-gray-500 text-lg">Stock restant : {product.stock}</p>
-        </div>
-
-        {/* Metadata */}
-        <div className="bg-gray-100 p-6 rounded-lg shadow">
-          <p className="mb-2">SKU : {product.sku}</p>
-          <p className="mb-2">Poids : {product.weight} kg</p>
-          <p className="mb-2">
-            Dimensions : {product.dimensions.width} x {product.dimensions.height} x{" "}
-            {product.dimensions.depth} cm
-          </p>
-          <p className="mb-2">Garantie : {product.warrantyInformation}</p>
-          <p className="mb-2">Politique de retour : {product.returnPolicy}</p>
-          <p className="mb-2">
-            Livraison : {product.shippingInformation}
-          </p>
-        </div>
-      </div>
-
-      {/* Reviews */}
-      <div className="mt-10">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">
-          Commentaires
-        </h2>
-        <div className="space-y-6">
-          {product.reviews.map((review, index) => (
-            <div
-              key={index}
-              className="bg-white p-6 rounded-lg shadow flex flex-col gap-4 border border-gray-200"
-            >
-              <div className="flex justify-between">
-                <p className="font-semibold text-lg text-gray-800">
-                  {review.reviewerName}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Évaluation : {review.rating} / 5
-                </p>
-              </div>
-              <p className="text-gray-700">{review.comment}</p>
-              <p className="text-sm text-gray-400">
-                Publié le : {new Date(review.date).toLocaleDateString()}
-              </p>
+              ))}
             </div>
-          ))}
+          </div>
+
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.title}</h1>
+              <p className="text-gray-500">{product.category} - {product.brand}</p>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-bold text-indigo-600">{product.price} €</span>
+                <span className="text-green-500 text-sm">
+                  -{product.discountPercentage}%
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex text-yellow-400">
+                  {'★'.repeat(Math.round(product.rating))}
+                  {'☆'.repeat(5 - Math.round(product.rating))}
+                </div>
+                <span className="text-sm text-gray-500">
+                  ({product.reviews.length} avis)
+                </span>
+              </div>
+            </div>
+
+            <p className="text-gray-600">{product.description}</p>
+
+            <div className="space-y-4">
+              <button
+                onClick={() => dispatch(addToCart(product))}
+                className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg 
+                         hover:bg-indigo-700 transition-colors"
+              >
+                Ajouter au panier
+              </button>
+              
+              <button
+                onClick={() => dispatch(toggleWishlist(product))}
+                className={`w-full py-3 px-4 rounded-lg border transition-colors
+                          ${isInWishlist 
+                            ? 'border-red-500 text-red-500 hover:bg-red-50' 
+                            : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                          }`}
+              >
+                {isInWishlist ? 'Retirer des favoris' : 'Ajouter aux favoris'}
+              </button>
+            </div>
+
+            <div className="border-t pt-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-500">Stock</p>
+                  <p className="font-medium">{product.stock} unités</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">SKU</p>
+                  <p className="font-medium">{product.sku}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Poids</p>
+                  <p className="font-medium">{product.weight} kg</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Dimensions</p>
+                  <p className="font-medium">
+                    {product.dimensions.width} x {product.dimensions.height} x {product.dimensions.depth} cm
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="border-t">
+          <div className="p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Avis clients</h2>
+            <div className="space-y-6">
+              {product.reviews.map((review, index) => (
+                <div key={index} className="border-b last:border-0 pb-6 last:pb-0">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <p className="font-medium text-gray-900">{review.reviewerName}</p>
+                      <div className="flex text-yellow-400 text-sm">
+                        {'★'.repeat(review.rating)}
+                        {'☆'.repeat(5 - review.rating)}
+                      </div>
+                    </div>
+                    <span className="text-sm text-gray-500">
+                      {new Date(review.date).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <p className="text-gray-600">{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>

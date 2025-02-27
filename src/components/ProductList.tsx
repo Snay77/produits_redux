@@ -26,7 +26,7 @@ const ProductList = () => {
 
   const [searchQuery, setSearchQuery] = useState(""); // Pour stocker la recherche
 
-  // Effectue la requête API pour récupérer les produits filtrés par recherche
+  // Effectue la requête API pour récupérer les produits filtrés avec la recherche
   const handleSearch = async () => {
     if (searchQuery.trim()) {
       try {
@@ -41,7 +41,7 @@ const ProductList = () => {
     }
   };
 
-  // Au montage ou changement de page, on déclenche la récupération des produits
+  // Récupère les produits en fonction de la page
   React.useEffect(() => {
     dispatch(fetchProducts(currentPage || 1));
   }, [dispatch, currentPage]);
@@ -51,116 +51,121 @@ const ProductList = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 text-center mb-8">Liste des Produits</h1>
+    <div className="max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Nos Produits</h1>
 
-      <div className="mb-6 flex justify-center">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)} // Capture la recherche
-          placeholder="Rechercher un produit"
-          className="border border-gray-300 p-2 rounded-lg w-1/2"
-        />
-        <button
-          onClick={handleSearch}
-          className="bg-blue-500 text-white px-4 py-2 rounded ml-4 hover:bg-blue-600"
-        >
-          Rechercher
-        </button>
+      {/* Barre de recherche */}
+      <div className="mb-8">
+        <div className="max-w-xl mx-auto flex gap-4">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Rechercher un produit..."
+            className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+          />
+          <button
+            onClick={handleSearch}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            Rechercher
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((product: Product) => (
           <div
             key={product.id}
-            className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow"
+            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden"
           >
-            <img
-              src={product.thumbnail}
-              alt={product.title}
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              {product.title}
-            </h2>
-            <p className="text-gray-600 mb-2">Prix : {product.price} EUR</p>
-            <div className="flex items-center justify-between mb-4">
-              <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">
-                {product.reviews.length} Avis
-              </span>
-              <span className="text-gray-500 text-sm">
-                Évaluation : {product.rating} / 5
-              </span>
+            <div className="relative">
+              <img
+                src={product.thumbnail}
+                alt={product.title}
+                className="w-full h-48 object-cover"
+              />
+              <button
+                onClick={() => dispatch(toggleWishlist(product))}
+                className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+              >
+                {isInWishlist(product.id) ? (
+                  /* Icône cœur plein (rouge) */
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    className="w-5 h-5 text-red-500"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M11.998 21.35l-1.448-1.32C5.4 15.368 2 12.273 2 8.497 2 5.421 4.42 3 7.497 3c1.74 0 3.409.81 4.501 2.09C13.093 3.81 14.762 3 16.502 3 19.58 3 22 5.421 22 8.497c0 3.776-3.4 6.871-8.55 11.534l-1.452 1.319z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  /* Icône cœur vide (gris) */
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    className="w-5 h-5 text-gray-400"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 
+                      7.22 9 12 9 12s9-4.78 9-12z"
+                    />
+                  </svg>
+                )}
+              </button>
             </div>
-            <Link
-              to={`/products/${product.id}`}
-              className="text-blue-500 underline hover:text-blue-700 mb-4 block"
-            >
-              Voir le produit
-            </Link>
-            <button
-              onClick={() => dispatch(addToCart(product))}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full"
-            >
-              Ajouter au panier
-            </button>
 
-            {/* Bouton Wishlist */}
-            <button
-              onClick={() => dispatch(toggleWishlist(product))}
-              className="mt-4"
-            >
-              {isInWishlist(product.id) ? (
-                /* Icône cœur plein (rouge) */
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                  className="text-red-500 w-6 h-6"
+            <div className="p-4">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">{product.title}</h2>
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-lg font-bold text-indigo-600">{product.price} €</span>
+                <div className="flex items-center">
+                  <span className="text-yellow-400">★</span>
+                  <span className="text-sm text-gray-600 ml-1">{product.rating}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <Link
+                  to={`/products/${product.id}`}
+                  className="block text-center py-2 px-4 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
                 >
-                  <path
-                    fillRule="evenodd"
-                    d="M11.998 21.35l-1.448-1.32C5.4 15.368 2 12.273 2 8.497 2 5.421 4.42 3 7.497 3c1.74 0 3.409.81 4.501 2.09C13.093 3.81 14.762 3 16.502 3 19.58 3 22 5.421 22 8.497c0 3.776-3.4 6.871-8.55 11.534l-1.452 1.319z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              ) : (
-                /* Icône cœur vide (gris) */
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  className="text-gray-500 w-6 h-6"
+                  Voir les détails
+                </Link>
+                <button
+                  onClick={() => dispatch(addToCart(product))}
+                  className="w-full py-2 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 
-                    7.22 9 12 9 12s9-4.78 9-12z"
-                  />
-                </svg>
-              )}
-            </button>
+                  Ajouter au panier
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
       {/* Pagination */}
-      <div className="flex justify-between mt-8">
+      <div className="flex justify-center gap-4 mt-8">
         <button
           onClick={() => dispatch(setPage(currentPage - 1))}
           disabled={currentPage === 1}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Précédent
         </button>
         <button
           onClick={() => dispatch(setPage(currentPage + 1))}
           disabled={currentPage * 10 >= 194}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Suivant
         </button>
