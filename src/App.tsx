@@ -4,8 +4,20 @@ import ProductDetails from "./components/ProductDetails";
 import Cart from "./components/Cart";
 import ProductList from "./components/ProductList";
 import Wishlist from "./components/Wishlist";
+import { useSelector } from "react-redux";
+import { RootState } from "./store/store";
 
 const App = () => {
+  // Récupérer le nombre d'articles dans le panier
+  const cartItemsCount = useSelector((state: RootState) => 
+    state.cart.items.reduce((total, item) => total + (item.quantity ?? 0), 0)
+  );
+
+  // Récupérer le nombre d'articles dans la wishlist
+  const wishlistItemsCount = useSelector((state: RootState) => 
+    state.wishlist.items.length
+  );
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-50">
@@ -22,15 +34,25 @@ const App = () => {
                 </Link>
                 <Link 
                   to="/cart" 
-                  className="text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium relative"
                 >
                   Panier
+                  {cartItemsCount > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-indigo-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartItemsCount}
+                    </span>
+                  )}
                 </Link>
                 <Link 
                   to="/wishlist" 
-                  className="text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-600 hover:text-indigo-600 transition-colors px-3 py-2 rounded-md text-sm font-medium relative"
                 >
                   Wishlist
+                  {wishlistItemsCount > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {wishlistItemsCount}
+                    </span>
+                  )}
                 </Link>
               </div>
             </div>
